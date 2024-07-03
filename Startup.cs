@@ -182,6 +182,8 @@ public class Startup
 
         app.UseRouting();
 
+        app.UseCors("AllowAllOrigins");
+
         app.UseAuthentication();
         app.UseAuthorization();
 
