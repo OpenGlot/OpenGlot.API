@@ -272,43 +272,5 @@ namespace PolyglotAPI.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
-
-        [HttpPost("Login2")]
-        public async Task<IActionResult> LoginUser2()
-        {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            if (claimsIdentity == null)
-            {
-                return Unauthorized("Unable to retrieve user claims.");
-            }
-
-            var sub = claimsIdentity.FindFirst(c => c.Type == "sub")?.Value;
-            var email = claimsIdentity.FindFirst(c => c.Type == "email")?.Value;
-            var name = claimsIdentity.FindFirst(c => c.Type == "name")?.Value;
-
-            if (string.IsNullOrEmpty(sub) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(name))
-            {
-                return BadRequest("Invalid token information.");
-            }
-
-            try
-            {
-                var user = await _userRepository.GetUserByIdAsync(Guid.Parse(sub));
-                if (user == null)
-                {
-                    return NotFound("User not found.");
-                }
-                else
-                {
-                    return Ok(user);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Error registering user: {0}", ex.Message);
-                return StatusCode(500, "Internal server error");
-            }
-        }
-
     }
 }
