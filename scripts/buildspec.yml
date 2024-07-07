@@ -10,6 +10,14 @@ phases:
       - echo "AWS_REGION=$AWS_REGION" >> env_vars
       - echo "ECR_REPOSITORY_URI=$ECR_REPOSITORY_URI" >> env_vars
       - echo "ECR_REPOSITORY_API=$ECR_REPOSITORY_API" >> env_vars
+      - echo "EXECUTION_ROLE_ARN=$EXECUTION_ROLE_ARN" >> env_vars
+      - echo "CLUSTER_NAME=$CLUSTER_NAME" >> env_vars
+      - echo "SERVICE_NAME=$SERVICE_NAME" >> env_vars
+      - echo "TASK_CPU=$TASK_CPU" >> env_vars
+      - echo "TASK_MEMORY=$TASK_MEMORY" >> env_vars
+      - echo "CONTAINER_CPU=$CONTAINER_CPU" >> env_vars
+      - echo "CONTAINER_MEMORY=$CONTAINER_MEMORY" >> env_vars
+      - echo "TASK_FAMILY=$TASK_FAMILY" >> env_vars
   build:
     commands:
       - echo Building Docker image...
@@ -18,17 +26,51 @@ phases:
       - echo Tagging the image with 'latest'...
       - docker tag $ECR_REPOSITORY_API:$IMAGE_TAG $ECR_REPOSITORY_URI/$ECR_REPOSITORY_API:latest
       - docker tag $ECR_REPOSITORY_API:$IMAGE_TAG $ECR_REPOSITORY_URI/$ECR_REPOSITORY_API:$IMAGE_TAG
-      - printf '[{"name":"%s","imageUri":"%s"}]' "$ECR_REPOSITORY_API" "$ECR_REPOSITORY_URI/$ECR_REPOSITORY_API:latest" > imagedefinitions.json
-      - cat imagedefinitions.json
   post_build:
     commands:
       - echo Pushing Docker image to Amazon ECR with build ID tag...
       - docker push $ECR_REPOSITORY_URI/$ECR_REPOSITORY_API:$IMAGE_TAG
       - echo Pushing Docker image to Amazon ECR with 'latest' tag...
       - docker push $ECR_REPOSITORY_URI/$ECR_REPOSITORY_API:latest
+      - echo Registering new task definition in ECS...
+      - |
+        aws ecs register-task-definition \
+          --family $TASK_FAMILY \
+          --network-mode awsvpc \
+          --requires-compatibilities FARGATE \
+          --cpu $TASK_CPU \
+          --memory $TASK_MEMORY \
+          --execution-role-arn $EXECUTION_ROLE_ARN \
+          --container-definitions "[
+            {
+              \"name\": \"$ECR_REPOSITORY_API\",
+              \"image\": \"$ECR_REPOSITORY_URI/$ECR_REPOSITORY_API:$IMAGE_TAG\",
+              \"essential\": true,
+              \"cpu\": $CONTAINER_CPU,
+              \"memory\": $CONTAINER_MEMORY,
+              \"portMappings\": [
+                {
+                  \"containerPort\": 8080,
+                  \"hostPort\": 8080,
+                  \"protocol\": \"tcp\"
+                }
+              ],
+              \"logConfiguration\": {
+                \"logDriver\": \"awslogs\",
+                \"options\": {
+                  \"awslogs-group\": \"/ecs/$TASK_FAMILY\",
+                  \"awslogs-create-group\": \"true\",
+                  \"awslogs-region\": \"$AWS_REGION\",
+                  \"awslogs-stream-prefix\": \"ecs\"
+                }
+              }
+            }
+          ]"
+      - echo Updating ECS service to use the new task definition...
+      - export TASK_DEFINITION_ARN=$(aws ecs list-task-definitions --family-prefix $TASK_FAMILY --sort DESC --max-items 1 --query "taskDefinitionArns[0]" --output text)
+      - aws ecs update-service --cluster $CLUSTER_NAME --service $SERVICE_NAME --task-definition $TASK_DEFINITION_ARN
 
 artifacts:
-  files: 
+  files:
     - '**/*'
     - env_vars
-    - imagedefinitions.json
