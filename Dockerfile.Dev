@@ -1,0 +1,14 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+WORKDIR /app
+
+COPY ["PolyglotAPI.csproj", "."]
+RUN dotnet restore "./PolyglotAPI.csproj"
+COPY . .
+
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+EXPOSE 8080
+EXPOSE 8081
+
+ENTRYPOINT ["dotnet", "watch", "run", "--project", "PolyglotAPI.csproj", "--urls", "http://0.0.0.0:8080"]
