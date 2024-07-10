@@ -193,7 +193,7 @@ public class Startup
             endpoints.MapControllers();
         });
 
-        if (env.IsDevelopment())
+        if (env.IsDevelopment() || env.IsEnvironment("Docker"))
         {
             app.UseDeveloperExceptionPage();
         }

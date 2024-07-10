@@ -5,6 +5,11 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        Console.WriteLine("Environment Variables:");
+        foreach (var env in Environment.GetEnvironmentVariables().Keys)
+        {
+            Console.WriteLine($"{env}: {Environment.GetEnvironmentVariable(env.ToString())}");
+        }
         CreateHostBuilder(args).Build().Run();
     }
 
