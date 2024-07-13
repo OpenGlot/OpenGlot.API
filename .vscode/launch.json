@@ -12,7 +12,7 @@
                 "pipeArgs": [
                     "exec",
                     "-i",
-                    "openglothub_api_1"
+                    "openglothub-api-1"
                 ],
                 "debuggerPath": "/vsdbg/vsdbg",
                 "quoteArgs": false
