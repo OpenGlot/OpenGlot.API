@@ -59,6 +59,16 @@ phases:
                   \"protocol\": \"tcp\"
                 }
               ],
+              \"environment\": [
+                {
+                  \"name\": \"ASPNETCORE_ENVIRONMENT\",
+                  \"value\": \"$ASPNETCORE_ENVIRONMENT\"
+                },
+                {
+                  \"name\": \"ConnectionStrings__DefaultConnection\",
+                  \"value\": \"$ConnectionStrings__DefaultConnection\"
+                }
+              ],
               \"logConfiguration\": {
                 \"logDriver\": \"awslogs\",
                 \"options\": {
