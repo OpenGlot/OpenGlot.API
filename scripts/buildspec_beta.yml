@@ -18,6 +18,8 @@ phases:
       - echo "CONTAINER_CPU=$CONTAINER_CPU" >> env_vars
       - echo "CONTAINER_MEMORY=$CONTAINER_MEMORY" >> env_vars
       - echo "TASK_FAMILY=$TASK_FAMILY" >> env_vars
+      - echo "ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT" >> env_vars
+      - echo "ConnectionStrings__DefaultConnection=$ConnectionStrings__DefaultConnection" >> env_vars
   build:
     commands:
       - echo Building Docker image...
