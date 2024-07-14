@@ -14,4 +14,4 @@ RUN curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l /vsdbg
 EXPOSE 8080
 EXPOSE 8081
 
-ENTRYPOINT ["dotnet", "watch", "run", "--project", "PolyglotAPI.csproj",  "--launch-profile", "Container (Dockerfile)", "--urls", "http://0.0.0.0:8080"]
+ENTRYPOINT ["dotnet", "watch", "run", "--non-interactive", "--project", "PolyglotAPI.csproj",  "--launch-profile", "Container (Dockerfile)", "--urls", "http://0.0.0.0:8080"]

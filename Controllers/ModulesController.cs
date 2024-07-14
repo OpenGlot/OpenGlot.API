@@ -48,7 +48,15 @@ namespace PolyglotAPI.Controllers
         public ActionResult<Module> AddModule(Module module)
         {
             _logger.LogInformation("Adding a new module");
-            _moduleRepository.AddAsync(module);
+            try
+            {
+                _moduleRepository.AddAsync(module);
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Error adding module");
+                return BadRequest();
+            }
             return CreatedAtAction(nameof(GetModule), new { id = module.Id }, module);
         }
 

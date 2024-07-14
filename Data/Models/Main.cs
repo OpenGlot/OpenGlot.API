@@ -39,7 +39,7 @@ namespace PolyglotAPI.Data.Models
 
         [ForeignKey(nameof(Course))]
         public int CourseId { get; set; }
-        public virtual Course Course { get; set; }
+        public virtual Course? Course { get; set; }
 
         public virtual ICollection<Lesson>? Lessons { get; set; }
         public virtual ICollection<Progress>? Progresses { get; set; }
@@ -57,8 +57,8 @@ namespace PolyglotAPI.Data.Models
 
         [ForeignKey(nameof(Module))]
         public int ModuleId { get; set; }
-        public virtual Module Module { get; set; }
-
+        public virtual Module? Module { get; set; }
+        
         public virtual ICollection<Question>? Questions { get; set; }
         public virtual ICollection<Rating>? Ratings { get; set; }
     }

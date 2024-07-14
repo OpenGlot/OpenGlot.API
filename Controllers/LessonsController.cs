@@ -44,16 +44,25 @@ public class LessonsController : ControllerBase
     }
 
     // POST: api/Lessons
-    [HttpPut]
+    [HttpPost]
     public async Task<ActionResult<Lesson>> AddLesson(Lesson lesson)
     {
         _logger.LogInformation("Adding a new lesson");
-        await _lessonRepository.AddAsync(lesson);
+        try
+        {
+            await _lessonRepository.AddAsync(lesson);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex, "Error adding lesson");
+            return BadRequest();
+        }
+        
         return CreatedAtAction(nameof(GetLesson), new { id = lesson.Id }, lesson);
     }
 
     // PUT: api/Lessons/5
-    [HttpPost("{id}")]
+    [HttpPut("{id}")]
     public async Task<IActionResult> UpdateLesson(int id, Lesson lesson)
     {
         if (id != lesson.Id)
@@ -71,7 +80,16 @@ public class LessonsController : ControllerBase
     public async Task<IActionResult> DeleteLesson(int id)
     {
         _logger.LogInformation($"Deleting lesson with ID: {id}");
-        await _lessonRepository.DeleteAsync(id);
+        try
+        {
+            await _lessonRepository.DeleteAsync(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting lesson");
+            return BadRequest();
+        }
+        
         return NoContent();
     }
 }

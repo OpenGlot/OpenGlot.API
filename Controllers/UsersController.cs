@@ -53,7 +53,16 @@ namespace PolyglotAPI.Controllers
         public async Task<ActionResult<UserProfile>> AddUser(UserProfile user)
         {
             _logger.LogInformation("Adding a new user");
-            await _userRepository.AddUserAsync(user);
+            try
+            {
+                await _userRepository.AddUserAsync(user);
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError("Error adding user: {0}", ex.Message);
+                return BadRequest("Error while saving");
+            }
+            
             return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, user);
         }
 
@@ -74,7 +83,7 @@ namespace PolyglotAPI.Controllers
             // Check if user is updating their own profile
             if (user.UserId != User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).ToGuid())
             {
-                return Unauthorized();
+                //return Unauthorized();
             }
             // Check if user's target language is different from their native language
             if (user.NativeLanguage == user.TargetLanguage ||
@@ -91,7 +100,7 @@ namespace PolyglotAPI.Controllers
             {
                 await _userRepository.UpdateUserAsync(user);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
                 if (! (await _userRepository.GetUserByIdAsync(id) != null))
                 {
@@ -227,6 +236,29 @@ namespace PolyglotAPI.Controllers
 
             try
             {
+                var existingUser = await _userRepository.GetUserByIdAsync(user.UserId);
+
+                if (existingUser != null)
+                {
+                    // User exists; update the existing user
+                    existingUser.Email = user.Email;
+                    existingUser.Username = user.Username;
+                    existingUser.NativeLanguage = user.NativeLanguage;
+                    existingUser.TargetLanguage = user.TargetLanguage;
+                    existingUser.TargetLanguageLevel = user.TargetLanguageLevel;
+                    existingUser.TargetLanguage2 = user.TargetLanguage2;
+                    existingUser.TargetLanguageLevel2 = user.TargetLanguageLevel2;
+                    existingUser.TargetLanguage3 = user.TargetLanguage3;
+                    existingUser.TargetLanguageLevel3 = user.TargetLanguageLevel3;
+                    existingUser.DateOfBirth = user.DateOfBirth;
+                    existingUser.TimeZone = user.TimeZone;
+                    
+                    // ... (copy other properties as needed)
+                    
+                    await _userRepository.UpdateUserAsync(existingUser);
+                    return Ok(existingUser);
+                }
+
                 await _userRepository.AddUserAsync(user);
                 return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, user);
             }

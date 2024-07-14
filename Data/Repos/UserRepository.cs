@@ -52,7 +52,7 @@ public class UserRepository : IUserRepository
         }
 
         public async Task AddUserAsync(UserProfile user)
-        {
+        {            
             await _context.UserProfiles.AddAsync(user);
             await _context.SaveChangesAsync();
         }

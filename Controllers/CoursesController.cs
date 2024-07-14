@@ -48,7 +48,16 @@ namespace PolyglotAPI.Controllers
         public ActionResult<Course> AddCourse(Course course)
         {
             _logger.LogInformation("Adding a new course");
-            _courseRepository.AddAsync(course);
+            try
+            {
+                _courseRepository.AddAsync(course);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Error adding course: {e.Message}");
+                return BadRequest();
+            }
+            
             return CreatedAtAction(nameof(GetCourse), new { id = course.Id }, course);
         }
 
