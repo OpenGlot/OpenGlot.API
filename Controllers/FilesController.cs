@@ -101,6 +101,20 @@ namespace PolyglotAPI.Controllers
             return Ok(images);
         }
 
+        [HttpGet("search/audios/{search}")]
+        public async Task<IActionResult> GetAllAudios(string search)
+        {
+            var audios = await _filesRepository.GetAllAudiosAsync();
+            return Ok(audios);
+        }
+
+        [HttpGet("search/images/{search}")]
+        public async Task<IActionResult> GetImagesSearch(string search)
+        {
+            var images = await _filesRepository.GetAllImagesAsync();
+            return Ok(images);
+        }
+
         [HttpGet("audio/{id}")]
         public async Task<IActionResult> GetAudioById(int id)
         {

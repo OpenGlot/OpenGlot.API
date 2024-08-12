@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using PolyglotAPI.Data.Models;
 
 namespace PolyglotAPI.Data.Repos
@@ -54,6 +55,21 @@ namespace PolyglotAPI.Data.Repos
         public async Task<IEnumerable<Image>> GetAllImagesAsync()
         {
             return await _context.Images.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Audio>> SearchAudiosAsync(string searchText, string languageCode)
+        {
+            return await _context.Audios
+                .Where(x => x.Transcript.Contains(searchText) || x.EnglishTranslation.Contains(searchText))
+                .Where(x => x.LanguageCode == languageCode || languageCode.IsNullOrEmpty() )
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Image>> SearchImagesAsync(string searchText)
+        {
+            return await _context.Images
+                .Where( x =>   x.Description.Contains(searchText) )
+                .ToListAsync();
         }
 
         public async Task<Audio?> GetAudioByIdAsync(int id)
