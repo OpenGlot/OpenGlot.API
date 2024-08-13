@@ -73,12 +73,14 @@ namespace PolyglotAPI.Controllers
                 {
                     audios.Add(new Audio
                     {
-                        Id = int.Parse(record.sentence_id),
+                        //Id = int.Parse(record.sentence_id),
+
                         SentenceId = record.sentence_id,
+                        EnglishTranslation = "",
                         LanguageCode = record.language,
                         Transcript = record.sentence,
                         UrlKey = record.file_name,
-                        UploadedAt = DateTime.Now
+                        UploadedAt = DateTime.Now.ToUniversalTime()
                     });
                 }
             }
