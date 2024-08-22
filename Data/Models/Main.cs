@@ -85,7 +85,7 @@ namespace PolyglotAPI.Data.Models
 
         [ForeignKey(nameof(Lesson))]
         public int LessonId { get; set; }
-        public virtual Lesson Lesson { get; set; }
+        public virtual Lesson? Lesson { get; set; }
 
         [ForeignKey(nameof(Audio))]
         public int? AudioId { get; set; }
@@ -114,7 +114,7 @@ namespace PolyglotAPI.Data.Models
 
         [ForeignKey(nameof(Question))]
         public int QuestionId { get; set; }
-        public virtual Question Question { get; set; }
+        public virtual Question? Question { get; set; }
     }
 
     public enum ContentType
